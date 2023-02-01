@@ -1,0 +1,56 @@
+#include <stdio.h>
+#include <stdbool.h>
+#define MAX_PROCESSES 100
+typedef struct process
+{
+    int processId;
+    int burstTime;
+    int waitingTime;
+    int turnAroundTime;
+    bool completed;
+} Process;
+int findShortestJob(Process processes[], int n)
+{
+    int shortestJob = -1;
+    int shortestTime = 9999;
+    for (int i = 0; i < n; i++)
+    {
+        if (!processes[i].completed && processes[i].burstTime < shortestTime)
+        {
+            shortestTime = processes[i].burstTime;
+            shortestJob = i;
+        }
+    }
+    return shortestJob;
+}
+int main()
+{
+    Process processes[MAX_PROCESSES];
+    int n;
+    int totalWaitingTime = 0;
+    int totalTurnAroundTime = 0;
+    printf("Enter the number of processes: ");
+    scanf("%d", &n);
+    for (int i = 0; i < n; i++)
+    {
+        printf("Enter the burst time for process %d: ", i + 1);
+        scanf("%d", &processes[i].burstTime);
+        processes[i].processId = i + 1;
+        processes[i].completed = false;
+    }
+    printf("\nProcess\tBurst Time\tWaiting Time\tTurnaround Time\n");
+    for (int i = 0; i < n; i++)
+    {
+        int shortestJob = findShortestJob(processes, n);
+        processes[shortestJob].waitingTime = totalWaitingTime;
+        totalWaitingTime += processes[shortestJob].burstTime;
+        processes[shortestJob].turnAroundTime = totalWaitingTime;
+        totalTurnAroundTime += processes[shortestJob].turnAroundTime;
+        processes[shortestJob].completed = true;
+        printf("%d\t\t%d\t\t%d\t\t%d\n", processes[shortestJob].processId, processes[shortestJob].burstTime,
+               processes[shortestJob].waitingTime, processes[shortestJob].turnAroundTime);
+    }
+    printf("\nAverage Waiting Time: %f", (float)totalWaitingTime / n);
+    printf("\nAverage Turnaround Time: %f\n", (float)totalTurnAroundTime / n);
+    return 0;
+}
